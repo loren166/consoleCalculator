@@ -1,0 +1,24 @@
+{
+  "name": "consolecalculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/calculator.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/calculator.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/readline-sync": "^1.4.8",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2"
+  }
+}
