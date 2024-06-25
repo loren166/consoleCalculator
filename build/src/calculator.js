@@ -27,15 +27,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const readline = __importStar(require("readline"));
+const operations_1 = __importDefault(require("./operations"));
 const parser_1 = __importDefault(require("./parser"));
+class Calculator {
+    constructor() {
+        this.operations = {};
+        this.operations = { ...operations_1.default };
+    }
+    registerOperation(symbol, precedence, execute) {
+        this.operations[symbol] = { precedence, execute };
+    }
+    decision(expression) {
+        const parser = new parser_1.default(expression, this.operations);
+        return parser.decision();
+    }
+}
+const calculator = new Calculator();
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 rl.question('Введите выражение: ', (input) => {
     try {
-        const parser = new parser_1.default(input);
-        const result = parser.decision();
+        const result = calculator.decision(input);
         console.log(result);
     }
     catch (e) {
@@ -45,3 +59,4 @@ rl.question('Введите выражение: ', (input) => {
         rl.close();
     }
 });
+exports.default = Calculator;

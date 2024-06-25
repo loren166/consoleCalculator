@@ -1,5 +1,25 @@
 import * as readline from 'readline';
-import Parser from './parser';
+import operations from './operations';
+import Parser, {Operation} from './parser';
+
+
+class Calculator {
+    private operations: {[key: string]: Operation} = {}
+    constructor() {
+        this.operations = {...operations}
+    }
+
+    public registerOperation(symbol: string, precedence: number, execute: (a: number, b: number)=> number) {
+        this.operations[symbol] = {precedence, execute}
+    }
+
+    public decision(expression: string): number {
+        const parser = new Parser(expression, this.operations)
+        return parser.decision()
+    }
+}
+
+const calculator = new Calculator()
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -8,8 +28,7 @@ const rl = readline.createInterface({
 
 rl.question('Введите выражение: ', (input) => {
     try {
-        const parser = new Parser(input);
-        const result = parser.decision();
+        const result = calculator.decision(input);
         console.log(result);
     } catch (e) {
         console.error(e);
@@ -17,3 +36,5 @@ rl.question('Введите выражение: ', (input) => {
         rl.close();
     }
 });
+
+export default Calculator

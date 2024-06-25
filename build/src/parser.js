@@ -1,21 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Parser {
-    constructor(expression) {
+    constructor(expression, operations) {
         this.currentIndex = 0;
         this.tokens = [];
         this.expression = expression;
+        this.operations = operations;
         this.tokenize();
     }
     tokenize() {
-        const regex = /\d+(\.\d+)?|[+\-*/()]/g;
+        const regex = /-?\d+(\.\d+)?|[+\-*/^()]/g;
         const matches = this.expression.match(regex);
         if (matches) {
             for (const match of matches) {
-                if (/\d/.test(match)) {
+                if (/\d/.test(match) || (match.length > 1 && match[0] === '-' && /\d/.test(match[1]))) {
                     this.tokens.push({ type: 'number', value: match });
                 }
-                else if (/[+\-*/]/.test(match)) {
+                else if (/[+\-*/^]/.test(match)) {
                     this.tokens.push({ type: 'operator', value: match });
                 }
                 else if (/[()]/.test(match)) {
@@ -48,20 +49,31 @@ class Parser {
         }
         throw new Error(`Неизвестный токен: ${token.value}`);
     }
-    parseTerm() {
+    parseExponentiation() {
         let result = this.parsePrimary();
+        while (true) {
+            const token = this.tokens[this.currentIndex];
+            if (!token || token.type !== 'operator' || token.value !== '^') {
+                break;
+            }
+            this.getNextToken();
+            result = this.operations['^'].execute(result, this.parsePrimary());
+        }
+        return result;
+    }
+    parseTerm() {
+        let result = this.parseExponentiation();
         while (true) {
             const token = this.tokens[this.currentIndex];
             if (!token || (token.type !== 'operator' || (token.value !== '*' && token.value !== '/'))) {
                 break;
             }
+            const operation = this.operations[token.value];
+            if (operation.precedence !== 2) {
+                break;
+            }
             this.getNextToken();
-            if (token.value === '*') {
-                result *= this.parsePrimary();
-            }
-            else if (token.value === '/') {
-                result /= this.parsePrimary();
-            }
+            result = operation.execute(result, this.parseExponentiation());
         }
         return result;
     }
@@ -69,16 +81,12 @@ class Parser {
         let result = this.parseTerm();
         while (true) {
             const token = this.tokens[this.currentIndex];
-            if (!token || (token.value !== '+' && token.value !== '-')) {
+            if (!token || (token.type !== 'operator' || (token.value !== '+' && token.value !== '-'))) {
                 break;
             }
+            const operation = this.operations[token.value];
             this.getNextToken();
-            if (token.value === '+') {
-                result += this.parseTerm();
-            }
-            else if (token.value === '-') {
-                result -= this.parseTerm();
-            }
+            result = operation.execute(result, this.parseTerm());
         }
         return result;
     }
