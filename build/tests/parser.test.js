@@ -22,6 +22,9 @@ describe('Calculator', () => {
     it('Должен учитывать степень', () => {
         expect(calculator.decision('(2 + 1) ^ 3')).toBe(27);
     });
+    it('Сложное выражение', () => {
+        expect(calculator.decision('(1 + 2 + 5 * 3) - 5 ^ 2')).toBe(-7);
+    });
     it('Должен учитывать отрицательные числа', () => {
         expect(calculator.decision('-1 + 2 * 3')).toBe(5);
     });

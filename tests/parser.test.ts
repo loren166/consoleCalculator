@@ -5,7 +5,7 @@ describe('Calculator', () => {
 
     beforeAll(() => {
         calculator = new Calculator();
-        calculator.registerOperation('^', 3, (a, b) => Math.pow(a, b) )
+        calculator.registerOperation('^', 3, (a, b) => Math.pow(a, b));
     });
 
     it('Должен корректно вычислять выражения', () => {
@@ -22,6 +22,10 @@ describe('Calculator', () => {
 
     it('Должен учитывать степень', () => {
         expect(calculator.decision('(2 + 1) ^ 3')).toBe(27);
+    });
+
+    it('Сложное выражение', () => {
+        expect(calculator.decision('(1 + 2 + 5 * 3) - 5 ^ 2')).toBe(-7);
     });
 
     it('Должен учитывать отрицательные числа', () => {
